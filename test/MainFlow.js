@@ -4,16 +4,26 @@ var Crowdsale = artifacts.require("./Crowdsale.sol");
 var TOTAL_COINS = 1000000000000000;
 var CROWDSALE_CAP = 600000000000000;
 var PERIOD_30_DAYS = 30*24*60*60;
-var SEND_ETHER =  6000;
+var SEND_ETHER =  10000;
 var SKIN_PER_ETHER = 10000;
-var RECEIVE_SKIN_AMOUNT = SEND_ETHER * SKIN_PER_ETHER + (SEND_ETHER * SKIN_PER_ETHER * 15 / 100); // + 15% bonus
+var RECEIVE_SKIN_AMOUNT = SEND_ETHER * SKIN_PER_ETHER + ((SEND_ETHER * SKIN_PER_ETHER) / 5); // + 20% bonus
 
-contract('SkinCoin', function(accounts) {
+contract('MainFlow', function(accounts) {
 
   var eth = web3.eth;
   var owner = eth.accounts[0];
   var wallet = eth.accounts[1];
   var buyer = eth.accounts[2];
+
+  function printBalance() {
+    const ownerBalance = web3.eth.getBalance(owner);
+    const walletBalance = web3.eth.getBalance(wallet);
+    const buyerBalance = web3.eth.getBalance(buyer);
+
+    console.log("Owner balance", web3.fromWei(ownerBalance, "ether").toString(), " ETHER");
+    console.log("Wallet balance", web3.fromWei(walletBalance, "ether").toString(), " ETHER");
+    console.log("Buyer balance", web3.fromWei(buyerBalance, "ether").toString(), " ETHER");
+  }
 
 
   it("should put 1,000,000,000.000000 SkinCoin in the owner account", function() {
@@ -43,7 +53,7 @@ contract('SkinCoin', function(accounts) {
     });
   });
 
-  it("Buy 60,000,000 coins", function() {
+  it("Buy 100,000,000 coins", function() {
     return Crowdsale.deployed().then(function(crowd) {
        return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(SEND_ETHER, "ether")}).then(function(txn) {
           return SkinCoin.deployed().then(function(coin) {
@@ -69,10 +79,8 @@ contract('SkinCoin', function(accounts) {
   });
 
 
-  it("Check wallet balance", function() {
-    const walletBalance = web3.eth.getBalance(wallet);
-    console.log("Wallet balance", web3.fromWei(walletBalance, "ether").toString(), " ETHER");
-    assert.equal(web3.fromWei(walletBalance, "ether"), SEND_ETHER, SEND_ETHER + " wasn't in the Wallet account");
+  it("Get wallet balance", function() {
+     printBalance();
   });
 
 

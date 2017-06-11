@@ -20,7 +20,7 @@ contract StandardToken is BasicToken, ERC20 {
     return true;
   }
 
-  function approve(address _spender, uint _value) {
+  function approve(address _spender, uint _value) returns (bool)  {
     // To change the approve amount you first have to reduce the addresses`
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
@@ -28,6 +28,8 @@ contract StandardToken is BasicToken, ERC20 {
     if ((_value != 0) && (allowed[msg.sender][_spender] != 0)) throw;
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
+
+    return true;
   }
 
   function allowance(address _owner, address _spender) constant returns (uint remaining) {

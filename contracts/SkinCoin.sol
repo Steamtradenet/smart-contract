@@ -2,6 +2,7 @@ pragma solidity ^0.4.11;
 
 import "./SafeMath.sol";
 import "./StandardToken.sol";
+import "./TokenSpender.sol";
 
 
 contract SkinCoin is StandardToken {
@@ -21,6 +22,15 @@ contract SkinCoin is StandardToken {
     totalSupply = totalSupply.sub(_value);
     Transfer(msg.sender, 0x0, _value);
     return true;
+  }
+
+
+  /* Approve and then communicate the approved contract in a single tx */
+  function approveAndCall(address _spender, uint _value) {    
+      TokenSpender spender = TokenSpender(_spender);
+      if (approve(_spender, _value)) {
+          spender.receiveApproval(msg.sender, _value);
+      }
   }
 }
 

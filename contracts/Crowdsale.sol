@@ -19,7 +19,7 @@ contract Crowdsale is Pausable, PullPayment {
 	* Constants
 	*/
 	/* Minimum number of SkinCoin to sell */
-	uint public constant MIN_CAP = 60000000;
+	uint public constant MIN_CAP = 100000000;
 	/* Maximum number of SkinCoin to sell */
 	uint public constant MAX_CAP = 600000000;
 	/* Minimum amount to invest */
@@ -127,8 +127,7 @@ contract Crowdsale is Pausable, PullPayment {
 	 *Compute the RLC bonus according to the investment period
 	 */
 	function bonus(uint amount) internal constant returns (uint) {
-		if (now < startTime.add(3 days)) return (amount.add(amount.mul(15).div(100)));   // bonus 15%
-		if (now < startTime.add(13 days)) return (amount.add(amount.mul(5).div(100)));  // bonus 5%
+		if (now < startTime.add(2 days)) return (amount.add(amount.div(5)));   // bonus 20%
 		return amount;
 	}
 
@@ -136,13 +135,13 @@ contract Crowdsale is Pausable, PullPayment {
 	 * When MIN_CAP is not reach backer can call the approveAndCall function of the SkinCoin token contract
 	 * with this crowdsale contract on parameter with all the SkinCoin they get in order to be refund
 	 */
-	function receiveApproval(address _from, uint256 _value, bytes _extraData) minCapNotReached public {
+	function receiveApproval(address _from, uint256 _value) minCapNotReached public {
 		if (msg.sender != address(coin)) throw; 
 		
-		if (_extraData.length != 0) throw; // no extradata needed
+		// if (_extraData.length != 0) throw; // no extradata needed
 		
 		if (_value != backers[_from].coinSent) throw; // compare value from backer balance
-		
+
 		if (!coin.transferFrom(_from, address(this), _value)) throw ; // get the token back to the crowdsale contract
 
 		if (!coin.burn(_value)) throw ; // token sent for refund are burnt
