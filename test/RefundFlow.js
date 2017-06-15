@@ -179,6 +179,20 @@ contract('RefundFlow', function(accounts) {
     });
   });
 
+  it("Try to reserve the overlimit payments {from: buyer}", function() {
+    return SkinCoin.deployed().then(function(coin) {
+      return coin.balanceOf.call(buyer).then(function(balance) {
+        return Crowdsale.deployed().then(function(crowd) {
+          return coin.approveAndCall(crowd.address, balance.valueOf()+1, {from: buyer}).then(function() {
+            assert(false, "Throw was supposed to throw but didn't.");
+          })
+        }).catch(function(error) {
+          console.log("Throw was happened. Test succeeded.");
+        });
+      });
+    });
+  });
+
   it("Reserve the payments {from: buyer}", function() {
     return SkinCoin.deployed().then(function(coin) {
       return coin.balanceOf.call(buyer).then(function(balance) {

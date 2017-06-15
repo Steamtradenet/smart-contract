@@ -3,7 +3,8 @@ var Crowdsale = artifacts.require("./Crowdsale.sol");
 
 var TOTAL_COINS = 1000000000000000;
 var CROWDSALE_CAP = 600000000000000;
-var PERIOD_30_DAYS = 30*24*60*60;
+var PERIOD_28_DAYS = 28*24*60*60;
+var PERIOD_2_DAYS = 2*24*60*60;
 var SEND_ETHER =  10000;
 var SKIN_PER_ETHER = 10000;
 var RECEIVE_SKIN_AMOUNT = SEND_ETHER * SKIN_PER_ETHER + ((SEND_ETHER * SKIN_PER_ETHER) / 5); // + 20% bonus
@@ -45,8 +46,10 @@ contract('MainFlow', function(accounts) {
     });
   });
 
+
   it("Start Crowdsale contract", function() {
     return Crowdsale.deployed().then(function(crowd) {
+
       return crowd.start({from: owner}).then(function() {
         console.log("Craudsale started");
       });
@@ -55,7 +58,26 @@ contract('MainFlow', function(accounts) {
 
   it("Buy 100,000,000 coins", function() {
     return Crowdsale.deployed().then(function(crowd) {
-       return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(SEND_ETHER, "ether")}).then(function(txn) {
+
+        var logEvent = crowd.Logs();
+        logEvent.watch(function(err, result) {
+          if (err) {
+            console.log("Error event ", err);
+            return;
+          }
+          console.log("Logs event = ",result.args.amount,result.args.value);
+        }); 
+
+        var receiveETHEvent = crowd.ReceivedETH();
+        receiveETHEvent.watch(function(err, result) {
+          if (err) {
+            console.log("Error event ", err);
+            return;
+          }
+          console.log("ReceivedETH event = ",result.args.addr,result.args.value);
+        }); 
+
+        return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(SEND_ETHER, "ether")}).then(function(txn) {
           return SkinCoin.deployed().then(function(coin) {
             return coin.balanceOf.call(buyer);
           });
@@ -66,11 +88,63 @@ contract('MainFlow', function(accounts) {
      });
   });
 
+  it("Try to reserve the payments {from: buyer}", function() {
+    return SkinCoin.deployed().then(function(coin) {
+      return coin.balanceOf.call(buyer).then(function(balance) {
+        return Crowdsale.deployed().then(function(crowd) {
+          console.log('Buyer SKIN: ' + balance.valueOf());
+          return coin.approveAndCall(crowd.address, balance.valueOf(), {from: buyer}).then(function() {
+            assert(false, "Throw was supposed to throw but didn't.");
+          })
+        }).catch(function(error) {
+          console.log("Throw was happened. Test succeeded.");
+        });
+      });
+    });
+  });
+
+  it("Try to buy too more coins {from: buyer}", function() {
+    return Crowdsale.deployed().then(function(crowd) {
+       return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(600000000/SKIN_PER_ETHER+1, "ether")}).then(function(txn) {
+          assert(false, "Throw was supposed to throw but didn't.");
+       })
+     }).catch(function(error) {
+        console.log("Throw was happened. Test succeeded.");
+     });
+  });
+
+  it("Buy 10,000 coins without bonus", function() {
+    web3.evm.increaseTime(PERIOD_2_DAYS);
+
+    return Crowdsale.deployed().then(function(crowd) {
+       return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(1, "ether")}).then(function(txn) {
+          return SkinCoin.deployed().then(function(coin) {
+            return coin.balanceOf.call(buyer);
+          });
+       })
+     }).then(function(balance) {
+        console.log("Buyer balance: ", balance.valueOf(), " SKIN");
+        assert.equal(balance.valueOf(), RECEIVE_SKIN_AMOUNT + SKIN_PER_ETHER, RECEIVE_SKIN_AMOUNT + SKIN_PER_ETHER + " wasn't in the first account");
+     });
+  });
+
+
+  it("Set end of crowdsale period", function() {
+    web3.evm.increaseTime(PERIOD_28_DAYS);
+  });
+
+
+  it("Try to buy 10,000 more coins {from: buyer}", function() {
+    return Crowdsale.deployed().then(function(crowd) {
+       return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(1, "ether")}).then(function(txn) {
+          assert(false, "Throw was supposed to throw but didn't.");
+       })
+     }).catch(function(error) {
+        console.log("Throw was happened. Test succeeded.");
+     });
+  });
 
   it("Finalize crowdsale", function() {
-
-    web3.evm.increaseTime(PERIOD_30_DAYS);
-
     return Crowdsale.deployed().then(function(crowd) {
       return crowd.finalize({from: owner}).then(function() {
         console.log("Finalize");

@@ -86,8 +86,7 @@ contract Crowdsale is Pausable, PullPayment {
 	/* 
 	 * The fallback function corresponds to a donation in ETH
 	 */
-	function() stopInEmergency payable {
-		if (now > endTime) throw;
+	function() stopInEmergency respectTimeFrame payable {
 		receiveETH(msg.sender);
 	}
 
@@ -104,10 +103,10 @@ contract Crowdsale is Pausable, PullPayment {
 	/*
 	 *	Receives a donation in Ether
 	*/
-	function receiveETH(address beneficiary) internal respectTimeFrame  {
+	function receiveETH(address beneficiary) internal {
 		if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
 		
-		uint coinToSend = bonus(msg.value.mul(coinPerEther) /(1 ether)); // Compute the number of RLC to send
+		uint coinToSend = bonus(msg.value.mul(coinPerEther) /(1 ether)); // Compute the number of SkinCoin to send
 		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;	
 
 		Backer backer = backers[beneficiary];
@@ -126,10 +125,10 @@ contract Crowdsale is Pausable, PullPayment {
 	
 
 	/*
-	 *Compute the RLC bonus according to the investment period
+	 *Compute the SkinCoin bonus according to the investment period
 	 */
 	function bonus(uint amount) internal constant returns (uint) {
-		if (now < startTime.add(2 days)) return (amount.add(amount.div(5)));   // bonus 20%
+		if (now < startTime.add(2 days)) return amount.add(amount.div(5));   // bonus 20%
 		return amount;
 	}
 
