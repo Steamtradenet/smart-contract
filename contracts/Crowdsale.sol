@@ -42,7 +42,7 @@ contract Crowdsale is Pausable, PullPayment {
 	/* Number of SkinCoins sent to Ether contributors */
 	uint public coinSentToEther;
 	/* Crowdsale start time */
-	uint public startTime;
+	uint public startTime = 0;
 	/* Crowdsale end time */
 	uint public endTime;
 	/* Max cap has been reached */
@@ -95,6 +95,8 @@ contract Crowdsale is Pausable, PullPayment {
 	 * To call to start the crowdsale
 	 */
 	function start() onlyOwner {
+		if (startTime != 0) throw; // Crowdsale was already started
+
 		startTime = now ;            
 		endTime =  now + CROWDSALE_PERIOD;    
 	}
