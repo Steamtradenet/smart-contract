@@ -59,22 +59,22 @@ contract('MainFlow', function(accounts) {
   it("Buy 100,000,000 coins", function() {
     return Crowdsale.deployed().then(function(crowd) {
 
-        var logEvent = crowd.Logs();
-        logEvent.watch(function(err, result) {
+        var logCoinsEmitedEvent = crowd.LogCoinsEmited();
+        logCoinsEmitedEvent.watch(function(err, result) {
           if (err) {
             console.log("Error event ", err);
             return;
           }
-          console.log("Logs event = ",result.args.amount,result.args.value);
+          console.log("LogCoinsEmited event = ",result.args.amount,result.args.value);
         }); 
 
-        var receiveETHEvent = crowd.ReceivedETH();
-        receiveETHEvent.watch(function(err, result) {
+        var logReceivedETH = crowd.LogReceivedETH();
+        logReceivedETH.watch(function(err, result) {
           if (err) {
             console.log("Error event ", err);
             return;
           }
-          console.log("ReceivedETH event = ",result.args.addr,result.args.value);
+          console.log("LogReceivedETH event = ",result.args.addr,result.args.value);
         }); 
 
         return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(SEND_ETHER, "ether")}).then(function(txn) {

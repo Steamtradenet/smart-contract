@@ -25,7 +25,9 @@ contract Crowdsale is Pausable, PullPayment {
 	/* Minimum amount to invest */
 	uint public constant MIN_INVEST_ETHER = 100 finney;
 	/* Crowdsale period */
-	uint constant CROWDSALE_PERIOD = 30 days;
+	uint private constant CROWDSALE_PERIOD = 30 days;
+	/* Number of SkinCoins per Ether */
+	uint public constant COIN_PER_ETHER = 10000;
 
 
 	/*
@@ -35,14 +37,12 @@ contract Crowdsale is Pausable, PullPayment {
 	SkinCoin public coin;
     /* Multisig contract that will receive the Ether */
 	address public multisigEther;
-	/* Number of SkinCoins per Ether */
-	uint public coinPerEther;
 	/* Number of Ether received */
 	uint public etherReceived;
 	/* Number of SkinCoins sent to Ether contributors */
 	uint public coinSentToEther;
 	/* Crowdsale start time */
-	uint public startTime = 0;
+	uint public startTime;
 	/* Crowdsale end time */
 	uint public endTime;
 	/* Max cap has been reached */
@@ -70,8 +70,8 @@ contract Crowdsale is Pausable, PullPayment {
 	/*
 	 * Event
 	*/
-	event ReceivedETH(address addr, uint value);
-	event Logs(address indexed from, uint amount, string value);
+	event LogReceivedETH(address addr, uint value);
+	event LogCoinsEmited(address indexed from, uint amount);
 
 	/*
 	 * Constructor
@@ -79,8 +79,6 @@ contract Crowdsale is Pausable, PullPayment {
 	function Crowdsale(address _skinCoinAddress, address _to) {
 		coin = SkinCoin(_skinCoinAddress);
 		multisigEther = _to;
-		
-		coinPerEther = 10000;
 	}
 
 	/* 
@@ -106,7 +104,7 @@ contract Crowdsale is Pausable, PullPayment {
 	function receiveETH(address beneficiary) internal {
 		if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
 		
-		uint coinToSend = bonus(msg.value.mul(coinPerEther) /(1 ether)); // Compute the number of SkinCoin to send
+		uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER) /(1 ether)); // Compute the number of SkinCoin to send
 		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;	
 
 		Backer backer = backers[beneficiary];
@@ -119,8 +117,8 @@ contract Crowdsale is Pausable, PullPayment {
 		coinSentToEther = coinSentToEther.add(coinToSend);
 
 		// Send events
-		Logs(msg.sender ,coinToSend, "emitCoins");
-		ReceivedETH(beneficiary, etherReceived); 
+		LogCoinsEmited(msg.sender ,coinToSend);
+		LogReceivedETH(beneficiary, etherReceived); 
 	}
 	
 
