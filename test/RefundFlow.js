@@ -46,7 +46,7 @@ contract('RefundFlow', function(accounts) {
         return coin.balanceOf.call(Crowdsale.address);
       });
     }).then(function (balance) {
-      console.log("Craudsale balance: " + balance);
+      console.log("Crowdsale balance: " + balance);
       assert.equal(balance.valueOf(), CROWDSALE_CAP, "600,000,000.000000 wasn't in the Crowdsale account");
     });
   });
@@ -64,7 +64,7 @@ contract('RefundFlow', function(accounts) {
   it("Start Crowdsale contract", function() {
     return Crowdsale.deployed().then(function(crowd) {
       return crowd.start({from: owner}).then(function() {
-        console.log("Craudsale started.");
+        console.log("Crowdsale started.");
       });
     });
   });
