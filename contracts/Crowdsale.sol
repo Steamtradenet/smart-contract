@@ -86,7 +86,7 @@ contract Crowdsale is Pausable, PullPayment {
 	/* 
 	 * The fallback function corresponds to a donation in ETH
 	 */
-	function() payable {
+	function() stopInEmergency payable {
 		if (now > endTime) throw;
 		receiveETH(msg.sender);
 	}
@@ -104,7 +104,7 @@ contract Crowdsale is Pausable, PullPayment {
 	/*
 	 *	Receives a donation in Ether
 	*/
-	function receiveETH(address beneficiary) internal stopInEmergency  respectTimeFrame  {
+	function receiveETH(address beneficiary) internal respectTimeFrame  {
 		if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
 		
 		uint coinToSend = bonus(msg.value.mul(coinPerEther) /(1 ether)); // Compute the number of RLC to send
