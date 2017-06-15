@@ -110,7 +110,7 @@ contract Crowdsale is Pausable, PullPayment {
 		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;	
 
 		Backer backer = backers[beneficiary];
-		if (!coin.transfer(beneficiary, coinToSend)) throw; // Transfer SkinCoins right now 
+		coin.transfer(beneficiary, coinToSend); // Transfer SkinCoins right now 
 
 		backer.coinSent = backer.coinSent.add(coinToSend);
 		backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer    
@@ -143,7 +143,7 @@ contract Crowdsale is Pausable, PullPayment {
 		
 		if (_value != backers[_from].coinSent) throw; // compare value from backer balance
 
-		if (!coin.transferFrom(_from, address(this), _value)) throw ; // get the token back to the crowdsale contract
+		coin.transferFrom(_from, address(this), _value); // get the token back to the crowdsale contract
 
 		if (!coin.burn(_value)) throw ; // token sent for refund are burnt
 
