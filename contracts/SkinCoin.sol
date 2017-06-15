@@ -1,6 +1,5 @@
 pragma solidity ^0.4.11;
 
-import "./SafeMath.sol";
 import "./StandardToken.sol";
 import "./TokenSpender.sol";
 
