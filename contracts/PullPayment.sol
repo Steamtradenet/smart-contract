@@ -13,7 +13,7 @@ contract PullPayment {
   
   mapping(address => uint) public payments;
 
-  event RefundETH(address to, uint value);
+  event LogRefundETH(address to, uint value);
 
 
   /**
@@ -41,6 +41,6 @@ contract PullPayment {
     if (!payee.send(payment)) {
       throw;
     }
-    RefundETH(payee,payment);
+    LogRefundETH(payee,payment);
   }
 }

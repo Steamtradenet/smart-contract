@@ -210,8 +210,16 @@ contract('RefundFlow', function(accounts) {
 
   it("Refund the payments {from: buyer}", function() {
     return Crowdsale.deployed().then(function(crowd) {
-      return crowd.withdrawPayments({from: buyer}).then(function() {
-        console.log("Withdraw Payments was happened. Test succeeded.");
+
+      var oldBuyerBalance = web3.eth.getBalance(buyer);
+      console.log("Buyer balance", web3.fromWei(oldBuyerBalance, "ether").toString(), " ETHER");
+
+      return crowd.withdrawPayments({from: buyer, gas: 300000, gasPrice: 0}).then(function(txn) {
+
+        var refund = web3.eth.getBalance(buyer) - oldBuyerBalance;
+        console.log("Refund: " + refund);
+        assert.isAbove(refund, web3.toWei(1000, "ether"));
+        
       });
     });
   });
