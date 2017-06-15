@@ -80,7 +80,7 @@ contract Crowdsale is Pausable, PullPayment {
 		coin = SkinCoin(_skinCoinAddress);
 		multisigEther = _to;
 		
-		coinPerEther = 10000;	// will be update every 10min based on the kraken ETHBTC
+		coinPerEther = 10000;
 	}
 
 	/* 
