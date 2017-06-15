@@ -45,8 +45,6 @@ contract Crowdsale is Pausable, PullPayment {
 	uint public startTime;
 	/* Crowdsale end time */
 	uint public endTime;
-	/* Max cap has been reached */
-	bool public maxCapReached;
  	/* Is crowdsale still on going */
 	bool public crowdsaleClosed;
 
