@@ -102,7 +102,7 @@ contract Crowdsale is Pausable, PullPayment {
 	function receiveETH(address beneficiary) internal {
 		if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
 		
-		uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER) /(1 ether)); // Compute the number of SkinCoin to send
+		uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER) / (1 ether)); // Compute the number of SkinCoin to send
 		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;	
 
 		Backer backer = backers[beneficiary];
@@ -128,33 +128,10 @@ contract Crowdsale is Pausable, PullPayment {
 		return amount;
 	}
 
-	/* 
-	 * When MIN_CAP is not reach backer can call the approveAndCall function of the SkinCoin token contract
-	 * with this crowdsale contract on parameter with all the SkinCoin they get in order to be refund
-	 */
-	function receiveApproval(address _from, uint256 _value) minCapNotReached public {
-		if (msg.sender != address(coin)) throw; 
-		
-		// if (_extraData.length != 0) throw; // no extradata needed
-		
-		if (_value != backers[_from].coinSent) throw; // compare value from backer balance
-
-		coin.transferFrom(_from, address(this), _value); // get the token back to the crowdsale contract
-
-		if (!coin.burn(_value)) throw ; // token sent for refund are burnt
-
-		uint ETHToSend = backers[_from].weiReceived;
-		backers[_from].weiReceived=0;
-
-		if (ETHToSend > 0) {
-			asyncSend(_from, ETHToSend); // pull payment to get refund in ETH
-		}
-	}
-
 	/*	
 	 * Finalize the crowdsale, should be called after the refund period
 	*/
-	function finalize() onlyOwner {
+	function finalize() onlyOwner public {
 		// check
 		if (now < endTime) throw; // Cannot finalise before CROWDSALE_PERIOD
 
@@ -175,4 +152,32 @@ contract Crowdsale is Pausable, PullPayment {
 	function drain() onlyOwner {
 		if (!owner.send(this.balance)) throw;
 	}
+
+	/**
+	 * Allow to change the team multisig address in the case of emergency.
+	 */
+	function setMultisig(address addr) onlyOwner public {
+		if (addr == address(0)) throw;
+		multisigEther = addr;
+	}
+
+	/* 
+	 * First of all 
+	 */
+	function refund(uint _value) minCapNotReached public {
+		
+		if (_value != backers[msg.sender].coinSent) throw; // compare value from backer balance
+
+		coin.transferFrom(msg.sender, address(this), _value); // get the token back to the crowdsale contract
+
+		if (!coin.burn(_value)) throw ; // token sent for refund are burnt
+
+		uint ETHToSend = backers[msg.sender].weiReceived;
+		backers[msg.sender].weiReceived=0;
+
+		if (ETHToSend > 0) {
+			asyncSend(msg.sender, ETHToSend); // pull payment to get refund in ETH
+		}
+	}
+
 }

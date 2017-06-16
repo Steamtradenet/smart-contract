@@ -1,8 +1,6 @@
 pragma solidity ^0.4.11;
 
 import "./StandardToken.sol";
-import "./TokenSpender.sol";
-
 
 contract SkinCoin is StandardToken {
   string public constant name = "SkinCoin";
@@ -23,13 +21,6 @@ contract SkinCoin is StandardToken {
     return true;
   }
 
-
-  /* Approve and then communicate the approved contract in a single tx */
-  function approveAndCall(address _spender, uint _value) {    
-      TokenSpender spender = TokenSpender(_spender);
-      approve(_spender, _value);
-      spender.receiveApproval(msg.sender, _value);
-  }
 }
 
 

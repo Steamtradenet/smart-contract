@@ -179,15 +179,19 @@ contract('RefundFlow', function(accounts) {
     });
   });
 
-  it("Try to reserve the overlimit payments {from: buyer}", function() {
+  it("Approve the payments {from: buyer}", function() {
     return SkinCoin.deployed().then(function(coin) {
       return coin.balanceOf.call(buyer).then(function(balance) {
         return Crowdsale.deployed().then(function(crowd) {
-          return coin.approveAndCall(crowd.address, balance.valueOf()+1, {from: buyer}).then(function() {
-            assert(false, "Throw was supposed to throw but didn't.");
+          console.log('Buyer SKIN: ' + balance.valueOf());
+          return coin.approve(crowd.address, balance.valueOf(), {from: buyer}).then(function() {
+            console.log("Approve was happened. Test succeeded.");
+            return coin.allowance(buyer, crowd.address).then(function(approvedCount) {
+              console.log("Approved: " + approvedCount);              
+            })
           })
         }).catch(function(error) {
-          console.log("Throw was happened. Test succeeded.");
+          assert(false, "Throw was happened, but wasn't expected.");
         });
       });
     });
@@ -198,7 +202,7 @@ contract('RefundFlow', function(accounts) {
       return coin.balanceOf.call(buyer).then(function(balance) {
         return Crowdsale.deployed().then(function(crowd) {
           console.log('Buyer SKIN: ' + balance.valueOf());
-          return coin.approveAndCall(crowd.address, balance.valueOf(), {from: buyer}).then(function() {
+          return crowd.refund(balance.valueOf(), {from: buyer}).then(function() {
             console.log("Reserve was happened. Test succeeded.");
           })
         }).catch(function(error) {
@@ -219,7 +223,7 @@ contract('RefundFlow', function(accounts) {
         var refund = web3.eth.getBalance(buyer) - oldBuyerBalance;
         console.log("Refund: " + refund);
         assert.isAbove(refund, web3.toWei(1000, "ether"));
-        
+
       });
     });
   });
