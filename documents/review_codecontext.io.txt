@@ -1,0 +1,112 @@
+******************************************************************
+**          SkinCoin Token Audit / codecontext.io               **
+******************************************************************
+
+
+2.1 Severe
+
+2.1.1 Call to an untrusted external
+
+>> Fixed. Removed TokenSpender contract and aproveAndCall method from SkinCoin contract. Redesign refund logic. See b5a9c8cc611543b6376f70b7c20cae5f2670ce0b
+
+2.1.2 coinPerEth variable cannot be modified
+
+>> Fixed. See 896acdbc3297a19de6f055381f43d0c93a025921.
+
+
+2.2 Potential problems
+
+2.2.1 Possible loss of ownership
+
+>> Fixed. See 77d0195e7d6551f809ba4e927e3b7267b16b6166
+
+
+2.2.2 Unit tests are not covering important checks
+
+>> Covered by tests. See 8b3a83fbef63e851148d534987cd9231f6a87002
+
+2.2.3 Make backers data externally accessible
+
+>> Map "backers" declared as public, so no need to implement method GetBacker(..)
+
+
+2.2.4 Owner can corrupt the ICO by mistake
+
+>> Fixed. See cfb71ad15e79d82671d4bf4a26e8f9bbc6af39ac
+
+2.2.5 Fallback emergency stop
+
+>> Fixed. See 18a1789bedce9ed71a0c46a3bbc5920e452f16ae
+
+2.3 Warnings
+
+2.3.1 Use safemath everywhere
+
+>> Fixed. See 23dcab29a9caa150ab7589f6298f3dd492cabff7
+
+2.3.2 Unit tests should be atomic
+
+Unit tests are more clear to understand when they are separated from each other. No changes needed
+
+
+2.3.3 Code duplication
+
+
+>> Contracts were upgraded to the last ERC20 spec. See 25db994de33613e80f40220a4c2f4b69bfbe08d1
+
+
+2.3.4 Multisig destination limitations
+
+>> Mesuared. For emergency reason an extra "setMultisig(..)" method was added. See 
+
+
+2.4 Minor issues & comments
+
+2.4.1 crowdsaleClosedas a function
+
+>> Crowdsale contract uses public variable "crowdsaleClosed" to track the end of crowdsale, so no extra method is needed
+
+2.4.2 Modifiers usage
+
+>> Remove time conditions from fallback function to respectTimeFrame modifier. See 8b3a83fbef63e851148d534987cd9231f6a87002
+
+2.4.3 Use standard solidity documentation tags
+
+>> Not necessary
+
+2.4.4 Code style
+
+>> Some code style improvements was made. See ed8cba37db0de51462f35a52f530c1c867e415cd
+
+2.4.5 Unit tests contain misspelled words
+
+>> Fixed. See d4998ef48602078833aace332b1452891bb2e544
+
+2.4.6 Wrong documentation for running the tests
+
+>> Fixed. See 8cc1f911b1aad9d884d13435c954a9060b610813
+
+2.4.7 Consider using modern style test scripts
+
+>> Not necessary
+
+2.4.8 Consider checking the ETH balance in refunding test
+
+>> Improve test. See e285e3b303bec5b2724a184a3952c47f2908b5d6
+
+2.4.9 Unused variables
+
+>> Remove unused variable. See c3651be1ef9ae52c7303d51d6ac45794f1123f37
+
+2.4.10 Using block numbers instead block dates
+
+>> Not necessary
+
+
+
+
+
+
+
+
+
