@@ -6,7 +6,7 @@ var CROWDSALE_CAP = 600000000000000;
 var PERIOD_28_DAYS = 28*24*60*60;
 var PERIOD_2_DAYS = 2*24*60*60;
 var SEND_ETHER =  10000;
-var SKIN_PER_ETHER = 10000;
+var SKIN_PER_ETHER = 6000000000;
 var RECEIVE_SKIN_AMOUNT = SEND_ETHER * SKIN_PER_ETHER + ((SEND_ETHER * SKIN_PER_ETHER) / 5); // + 20% bonus
 
 contract('MainFlow', function(accounts) {
@@ -105,7 +105,7 @@ contract('MainFlow', function(accounts) {
 
   it("Try to buy too more coins {from: buyer}", function() {
     return Crowdsale.deployed().then(function(crowd) {
-       return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(600000000/SKIN_PER_ETHER+1, "ether")}).then(function(txn) {
+       return crowd.sendTransaction({from: buyer, to: crowd.address, value: web3.toWei(CROWDSALE_CAP/SKIN_PER_ETHER+1, "ether")}).then(function(txn) {
           assert(false, "Throw was supposed to throw but didn't.");
        })
      }).catch(function(error) {
@@ -113,7 +113,7 @@ contract('MainFlow', function(accounts) {
      });
   });
 
-  it("Buy 10,000 coins without bonus", function() {
+  it("Buy 6,000 coins without bonus", function() {
     web3.evm.increaseTime(PERIOD_2_DAYS);
 
     return Crowdsale.deployed().then(function(crowd) {

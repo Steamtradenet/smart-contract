@@ -19,15 +19,15 @@ contract Crowdsale is Pausable, PullPayment {
 	* Constants
 	*/
 	/* Minimum number of SkinCoin to sell */
-	uint public constant MIN_CAP = 100000000;
+	uint public constant MIN_CAP = 30000000000000; // 30,000,000 SkinCoins
 	/* Maximum number of SkinCoin to sell */
-	uint public constant MAX_CAP = 600000000;
+	uint public constant MAX_CAP = 600000000000000; // 600,000,000 SkinCoins
 	/* Minimum amount to invest */
 	uint public constant MIN_INVEST_ETHER = 100 finney;
 	/* Crowdsale period */
 	uint private constant CROWDSALE_PERIOD = 30 days;
 	/* Number of SkinCoins per Ether */
-	uint public constant COIN_PER_ETHER = 10000;
+	uint public constant COIN_PER_ETHER = 6000000000; // 6,000 SkinCoins
 
 
 	/*
@@ -162,8 +162,11 @@ contract Crowdsale is Pausable, PullPayment {
 	}
 
 	/* 
-	 * First of all 
-	 */
+  	 * When MIN_CAP is not reach:
+  	 * 1) backer call the "approve" function of the SkinCoin token contract with the amount of all SkinCoins they got in order to be refund
+  	 * 2) backer call the "refund" function of the Crowdsale contract with the same amount of SkinCoins
+   	 * 3) backer call the "withdrawPayments" function of the Crowdsale contract to get a refund in ETH
+   	 */
 	function refund(uint _value) minCapNotReached public {
 		
 		if (_value != backers[msg.sender].coinSent) throw; // compare value from backer balance

@@ -5,6 +5,7 @@ var TOTAL_COINS = 1000000000000000;
 var CROWDSALE_CAP = 600000000000000;
 var PERIOD_30_DAYS = 30*24*60*60;
 var PERIOD_15_DAYS = 15*24*60*60;
+var SKIN_PER_ETHER = 6000000000;
 
 contract('RefundFlow', function(accounts) {
 
@@ -140,7 +141,7 @@ contract('RefundFlow', function(accounts) {
      }).then(function(balance) {
         console.log("Buyer balance: ", balance.valueOf(), " SKIN");
 
-        var count = 1000*10000 + (1000*10000*0.2);
+        var count = 1000*SKIN_PER_ETHER + (1000*SKIN_PER_ETHER*0.2);
         assert.equal(balance.valueOf(), count, "10000 wasn't in the first account.");
      });
   });
@@ -202,9 +203,21 @@ contract('RefundFlow', function(accounts) {
       return coin.balanceOf.call(buyer).then(function(balance) {
         return Crowdsale.deployed().then(function(crowd) {
           console.log('Buyer SKIN: ' + balance.valueOf());
-          return crowd.refund(balance.valueOf(), {from: buyer}).then(function() {
-            console.log("Reserve was happened. Test succeeded.");
+
+          return coin.totalSupply().then(function(totalSupply) {
+            console.log('TotalSupply SKIN: ' + totalSupply);  
+          }).then(function() {
+            return crowd.refund(balance.valueOf(), {from: buyer}).then(function() {
+              console.log("Reserve was happened. Test succeeded.");
+              // assert.equal(coin.totalSupply, 1000 - balance.valueOf(), "Total supply is incorrect");
+            })
+         }).then(function() {
+          return coin.totalSupply().then(function(totalSupply) {
+            console.log('TotalSupply SKIN: ' + totalSupply);  
+
           })
+          
+         })
         }).catch(function(error) {
           assert(false, "Throw was happened, but wasn't expected.");
         });
@@ -212,21 +225,21 @@ contract('RefundFlow', function(accounts) {
     });
   });
 
-  it("Refund the payments {from: buyer}", function() {
-    return Crowdsale.deployed().then(function(crowd) {
+  // it("Refund the payments {from: buyer}", function() {
+  //   return Crowdsale.deployed().then(function(crowd) {
 
-      var oldBuyerBalance = web3.eth.getBalance(buyer);
-      console.log("Buyer balance", web3.fromWei(oldBuyerBalance, "ether").toString(), " ETHER");
+  //     var oldBuyerBalance = web3.eth.getBalance(buyer);
+  //     console.log("Buyer balance", web3.fromWei(oldBuyerBalance, "ether").toString(), " ETHER");
 
-      return crowd.withdrawPayments({from: buyer, gas: 300000, gasPrice: 0}).then(function(txn) {
+  //     return crowd.withdrawPayments({from: buyer, gas: 300000, gasPrice: 0}).then(function(txn) {
 
-        var refund = web3.eth.getBalance(buyer) - oldBuyerBalance;
-        console.log("Refund: " + refund);
-        assert.isAbove(refund, web3.toWei(1000, "ether"));
+  //       var refund = web3.eth.getBalance(buyer) - oldBuyerBalance;
+  //       console.log("Refund: " + refund);
+  //       assert.isAbove(refund, web3.toWei(1000, "ether"));
 
-      });
-    });
-  });
+  //     });
+  //   });
+  // });
 
   it("Finalize crowdsale, after the passage of 45 days", function() {
     web3.evm.increaseTime(PERIOD_15_DAYS);
