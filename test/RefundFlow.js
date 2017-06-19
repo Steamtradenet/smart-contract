@@ -180,6 +180,19 @@ contract('RefundFlow', function(accounts) {
     });
   });
 
+  it("Try to burn coins", function() {
+    return SkinCoin.deployed().then(function(coin) {
+      return coin.balanceOf.call(buyer).then(function(balance) {
+        console.log("Buyer balance: ", balance.valueOf(), " SKIN");
+        return coin.burn(balance.valueOf()).then(function() {
+          assert(false, "Throw was supposed to throw but didn't.");
+        });
+      });
+    }).catch(function(error) {
+      console.log("Throw was happened. Test succeeded.");
+    });
+  });
+
   it("Approve the payments {from: buyer}", function() {
     return SkinCoin.deployed().then(function(coin) {
       return coin.balanceOf.call(buyer).then(function(balance) {

@@ -128,6 +128,18 @@ contract('MainFlow', function(accounts) {
      });
   });
 
+  it("Try to burn coins", function() {
+    return SkinCoin.deployed().then(function(coin) {
+      return coin.balanceOf.call(buyer).then(function(balance) {
+        console.log("Buyer balance: ", balance.valueOf(), " SKIN");
+        return coin.burn(balance.valueOf()).then(function() {
+          assert(false, "Throw was supposed to throw but didn't.");
+        });
+      });
+    }).catch(function(error) {
+      console.log("Throw was happened. Test succeeded.");
+    });
+  });
 
   it("Set end of crowdsale period", function() {
     web3.evm.increaseTime(PERIOD_28_DAYS);
@@ -151,6 +163,43 @@ contract('MainFlow', function(accounts) {
       });
     });
   });
+
+  it("Try to invoke backSkinCoinOwner {from: buyer}", function() {
+    return Crowdsale.deployed().then(function(crowd) {
+      return crowd.backSkinCoinOwner({from: buyer}).then(function() {
+        assert(false, "Throw was supposed to throw but didn't.");
+      }).catch(function(error) {
+        console.log("Throw was happened. Test succeeded.");
+      });
+    });
+  });
+
+  it("Invoke backSkinCoinOwner {from: Crowdsale contract}", function() {
+    return Crowdsale.deployed().then(function(crowd) {
+      return crowd.backSkinCoinOwner().then(function() {
+        return SkinCoin.deployed().then(function(coin) {
+          return coin.owner.call().then(function(coinOwner) {
+            console.log("SkinCoin owner was changed to: " + coinOwner);
+            assert.equal(coinOwner, owner, "SkinCoin owner addresws must be equals to Crowdsale owner address");
+          })              
+        })
+      }).catch(function(error) {
+        assert(false, "Throw was happened, but wasn't expected.");
+      });
+    });
+  });
+
+
+  it("Invoke backSkinCoinOwner one more time {from: Crowdsale contract}", function() {
+    return Crowdsale.deployed().then(function(crowd) {
+      return crowd.backSkinCoinOwner().then(function() {
+        assert(false, "Throw was supposed to throw but didn't.");
+      }).catch(function(error) {
+        console.log("Throw was happened. Test succeeded.");
+      });
+    });
+  });
+
 
 
   it("Get wallet balance", function() {

@@ -161,6 +161,13 @@ contract Crowdsale is Pausable, PullPayment {
 		multisigEther = addr;
 	}
 
+	/**
+	 * Allow to back SkinCoin address in the case of emergency.
+	 */
+	function backSkinCoinOwner() onlyOwner public {
+		coin.transferOwnership(owner);
+	}
+
 	/* 
   	 * When MIN_CAP is not reach:
   	 * 1) backer call the "approve" function of the SkinCoin token contract with the amount of all SkinCoins they got in order to be refund
