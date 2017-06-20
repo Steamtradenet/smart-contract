@@ -132,8 +132,13 @@ contract Crowdsale is Pausable, PullPayment {
 	 * Finalize the crowdsale, should be called after the refund period
 	*/
 	function finalize() onlyOwner public {
-		// check
-		if (now < endTime) throw; // Cannot finalise before CROWDSALE_PERIOD
+
+		if (now < endTime) { // Cannot finalise before CROWDSALE_PERIOD or before selling all coins
+			if (coinSentToEther == MAX_CAP) {
+			} else {
+				throw;
+			}
+		}
 
 		if (coinSentToEther < MIN_CAP && now < endTime + 15 days) throw; // If MIN_CAP is not reached donors have 15days to get refund before we can finalise
 
@@ -162,11 +167,33 @@ contract Crowdsale is Pausable, PullPayment {
 	}
 
 	/**
-	 * Allow to back SkinCoin address in the case of emergency.
+	 * Manually back SkinCoin owner address.
 	 */
 	function backSkinCoinOwner() onlyOwner public {
 		coin.transferOwnership(owner);
 	}
+
+	/**
+	 * Transfer remains to owner in case if impossible to do min invest
+	 */
+	function getRemainCoins() onlyOwner public {
+		var remains = MAX_CAP - coinSentToEther;
+		uint minCoinsToSell = bonus(MIN_INVEST_ETHER.mul(COIN_PER_ETHER) / (1 ether));
+
+		if(remains > minCoinsToSell) throw;
+
+		Backer backer = backers[owner];
+		coin.transfer(owner, remains); // Transfer SkinCoins right now 
+
+		backer.coinSent = backer.coinSent.add(remains);
+
+		coinSentToEther = coinSentToEther.add(remains);
+
+		// Send events
+		LogCoinsEmited(this ,remains);
+		LogReceivedETH(owner, etherReceived); 
+	}
+
 
 	/* 
   	 * When MIN_CAP is not reach:

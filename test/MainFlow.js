@@ -65,7 +65,7 @@ contract('MainFlow', function(accounts) {
             console.log("Error event ", err);
             return;
           }
-          console.log("LogCoinsEmited event = ",result.args.amount,result.args.value);
+          console.log("LogCoinsEmited event = ",result.args.amount,result.args.from);
         }); 
 
         var logReceivedETH = crowd.LogReceivedETH();
