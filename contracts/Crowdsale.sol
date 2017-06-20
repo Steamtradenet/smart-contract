@@ -5,7 +5,10 @@ import "./Pausable.sol";
 import "./PullPayment.sol";
 import "./SkinCoin.sol";
 
-
+/*
+  Crowdsale Smart Contract for the skincoin.org project
+  This smart contract collects ETH, and in return emits SkinCoin tokens to the backers
+*/
 contract Crowdsale is Pausable, PullPayment {
     
     using SafeMath for uint;
