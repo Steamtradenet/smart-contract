@@ -8,8 +8,8 @@ module.exports = function(deployer) {
 	var owner = web3.eth.accounts[0];
 	var wallet = web3.eth.accounts[1];
 
-	//var owner = '0xB450A60385DbFE74Bf513F3a5e517B25C2566a56';
-	//var wallet = '0x9BDE9fbFB5E78c1dddA8842CE811dd9e750c380D';
+	// var owner = '0x6f2010D0FBaf8B7Dbc13eE7252FF8594A2Be3C51';
+	// var wallet = '0x532691886A05eDc95457BFd5aEDA9b65b5413c83';
 
 	console.log("Owner address: " + owner);	
 	console.log("Wallet address: " + wallet);	
