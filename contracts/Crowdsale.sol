@@ -105,7 +105,7 @@ contract Crowdsale is Pausable, PullPayment {
 	function receiveETH(address beneficiary) internal {
 		if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
 		
-		uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER) / (1 ether)); // Compute the number of SkinCoin to send
+		uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER).div(1 ether)); // Compute the number of SkinCoin to send
 		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;	
 
 		Backer backer = backers[beneficiary];
