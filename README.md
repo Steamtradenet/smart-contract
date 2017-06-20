@@ -16,9 +16,9 @@ To run test open the terminal and run the following commands:
 ```sh
 $ cd smart-contract
 $ truffle migrate
-$ traffle test ./test/MainFlow.js
-$ traffle test ./test/RefundFlow.js
-$ traffle test ./test/RefundFlow.js
+$ truffle test ./test/MainFlow.js
+$ truffle test ./test/RefundFlow.js
+$ truffle test ./test/RefundFlow.js
 ```
 
 **NOTE:** All tests must be run separately as specified
